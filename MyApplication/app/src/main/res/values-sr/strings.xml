@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Судоку</string>
+    <string name="done">Окончај</string>
+    <string name="mod1">Лако 70%</string>
+    <string name="mod2">Средње 40%</string>
+    <string name="mod3">Тешко 25%</string>
+    <string name="mod4">Подесиво 50%</string>
+    <string name="newGame">Нова Игра</string>
+    <string name="procenat">%</string>
+    <string name="restart">↺</string>
+    <string name="set">Подеси</string>
+    <string name="vrednost">50</string>
+    <string name="welcome">Добро Дошли</string>
+    <string name="clear">/X/</string>
+    <string name="chose">Изаберите тип игре :)</string>
+    <string name="Molimo_sacekajte">Молимо, сачекајте.</string>
+    <string name="Kreiranje_tabele_u_toku">Креирање табеле у току.</string>
+    <string name="custom">Подесиво</string>
+    <string name="info">Информације</string>
+    <string name="infoDEV1">Програмер:</string>
+    <string name="infoDEV2">Useful things</string>
+    <string name="infoEmail1">Eлекронска пошта:</string>
+    <string name="infoEmail2">limitless.persistance@gmail.com</string>
+    <string name="infoGIT1">GitHub репозиторијум</string>
+    <string name="infoGIT2">https://github.com/nikolaJapundzic/sudoku_android.git</string>
+    <string name="infoGame1">Правила игре:</string>
+    <string name="infoGame2">Сваки ред, колона и 3х3 квадрат, морају садржати бројеве од 1 до 9 без дупликата.</string>
+</resources>
