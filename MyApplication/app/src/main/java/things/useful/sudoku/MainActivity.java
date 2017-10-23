@@ -41,10 +41,13 @@ public class MainActivity extends AppCompatActivity {
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_main);
+
+
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
@@ -108,9 +111,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        seekBar.setMax(99);
-        seekBar.setProgress(50);
-        slider = seekBar.getProgress();
+        seekBar.setMax(79);
+        seekBar.setProgress(30);
+        slider = seekBar.getProgress()+20;
+
+
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
@@ -129,9 +135,9 @@ public class MainActivity extends AppCompatActivity {
 
                 float joker = (progress+300)/10;
                 textView2.setTextSize(joker);
-                textView2.setText(String.valueOf(progress));
-                buttCustom.setText(getResources().getString(R.string.custom) + " " + String.valueOf(progress) + "%");
-                slider = progress;
+                textView2.setText(String.valueOf(progress+20));
+                buttCustom.setText(getResources().getString(R.string.custom) + " " + String.valueOf(progress+20) + "%");
+                slider = progress+20;
                 //Toast.makeText(getApplicationContext(), String.valueOf(progress),Toast.LENGTH_LONG).show();
 
             }

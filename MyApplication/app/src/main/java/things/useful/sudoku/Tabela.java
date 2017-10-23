@@ -74,8 +74,13 @@ public class Tabela extends Algoritam_brz_isecanje {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabela);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        //new SimpleSyncTask().execute();
+
+
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
@@ -167,6 +172,13 @@ public class Tabela extends Algoritam_brz_isecanje {
                 new SimpleSyncTask().execute();
             }
         });
+
+        for(int i =0; i <lista.size(); i++){  // ovdfe se mora pre novog napisivanja preko buttona prvo obrisati sve sa buttona
+            lista.get(i).setText("");
+            lista.get(i).setClickable(true);
+        }
+        lista2 = new ArrayList<>();
+        new SimpleSyncTask().execute();
 
 
 
@@ -1594,7 +1606,7 @@ public class Tabela extends Algoritam_brz_isecanje {
     @Override
     protected void onStart() {
         super.onStart();
-            new SimpleSyncTask().execute();
+            /*new SimpleSyncTask().execute();*/
 
     }
 
