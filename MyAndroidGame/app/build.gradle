@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    buildToolsVersion "26.0.0"
     defaultConfig {
-        applicationId "things.useful.sudoku"
+        applicationId "things.useful.myandroidgame"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 5
-        versionName "1.5"
+        versionCode 1
+        versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -26,7 +26,5 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
-
     testCompile 'junit:junit:4.12'
 }

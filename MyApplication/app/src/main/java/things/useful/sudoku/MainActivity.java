@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
     TextView textView2;
     public static int slider;
 
+    public static int [] niz1BB = new int[81];
+    public static int [] niz1BKlikabilno = new int[81];
+    public static boolean nizovaProvera = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,5 +186,26 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         brojUnosa = 0;
         //Log.i(TAG, "On Start .....");
+    }
+
+    @Override
+    public void onBackPressed() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setMessage(getResources().getString(R.string.exitMain))
+                .setCancelable(false)
+                .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        MainActivity.this.finish();
+                    }
+                })
+                .setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        android.app.AlertDialog alert = builder.create();
+        alert.show();
+
     }
 }

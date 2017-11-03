@@ -6,12 +6,12 @@
     <string name="mod1">Easy 70%</string>
     <string name="mod2">Medium 40%</string>
     <string name="mod3">Hard 25%</string>
-    <string name="mod4">Custom  60%</string>
+    <string name="mod4">Custom  50%</string>
     <string name="custom">Custom</string>
     <string name="restart">↺</string>
     <string name="newGame">new game</string>
     <string name="procenat">%</string>
-    <string name="vrednost">60</string>
+    <string name="vrednost">50</string>
     <string name="clear">/X/</string>
     <string name="_1" translatable="false">1</string>
     <string name="_2" translatable="false">2</string>
@@ -37,5 +37,12 @@
     <string name="infoGIT1">GitHub repository: </string>
     <string name="infoGIT2">https://github.com/nikolaJapundzic/sudoku_android.git</string>
     <!-- About dialog -->
+
+
+    <string name="yes">Yes</string>
+    <string name="no">cancle</string>
+    <string name="exitTabela">If you press Yes, you will not be able to continue same game.</string>
+
+    <string name="exitMain">Are you sure you want to exit?</string>
 
 </resources>

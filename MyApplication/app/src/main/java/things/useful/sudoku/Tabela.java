@@ -1,13 +1,19 @@
 package things.useful.sudoku;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,7 +22,16 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.VideoView;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+
+import static things.useful.sudoku.MainActivity.niz1BB;
+import static things.useful.sudoku.MainActivity.niz1BKlikabilno;
+import static things.useful.sudoku.MainActivity.nizovaProvera;
 
 
 public class Tabela extends Algoritam_brz_isecanje {
@@ -24,11 +39,21 @@ public class Tabela extends Algoritam_brz_isecanje {
     public static String unos;
     public static String[]nizString;
     public static int brojacString;
+
+
+
     public static int [] niz1;  // resenje koje se prepravlja na resenje sa isecenim
+    public static boolean destroyProvera = true;
+
+
+
     public static int [] niz3 = new int[81]; // resenje koje ce se uporediti sa resenjem niz5
     public static int brojac43 = 1;
     public static boolean flagg = true;
     public static boolean flagBRE = true;
+    public String tag = "TAG";
+
+
 
     TextView textDialog;
     public static ProgressDialog progressDialo;
@@ -64,12 +89,14 @@ public class Tabela extends Algoritam_brz_isecanje {
     RadioGroup radioGroup;
 
     RadioButton radioButton1;
+    public static boolean flag7 = true;
 
     public VideoView myVideoView;
 
     public String path0 = "android.resource://things.useful.spreklame/" + R.raw.rek0;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +104,7 @@ public class Tabela extends Algoritam_brz_isecanje {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        Log.d(tag, "In the onCreate() event");
 
         //new SimpleSyncTask().execute();
 
@@ -151,9 +179,11 @@ public class Tabela extends Algoritam_brz_isecanje {
             public void onClick(View v) {
                 for(int i =0; i <lista.size(); i++){  // ovdfe se mora pre novog napisivanja preko buttona prvo obrisati sve sa buttona
                     lista.get(i).setText("");
-                    if(niz1[i]!=0){
-                        lista.get(i).setText(String.valueOf(niz1[i]));
+                    if(niz1BKlikabilno[i]!=0){
+                        lista.get(i).setText(String.valueOf(niz1BB[i]));
                     }
+
+
                 }
                 //Log.e("myApp", Arrays.toString(niz1));
             }
@@ -178,16 +208,33 @@ public class Tabela extends Algoritam_brz_isecanje {
             lista.get(i).setClickable(true);
         }
         lista2 = new ArrayList<>();
-        new SimpleSyncTask().execute();
 
 
+        /*nizovaProvera = true;*/
+        if(nizovaProvera){
+            lista2 = new ArrayList<>();
+            for(int i = 0; i<niz1BB.length; i++){
+                if(niz1BB[i]!=0){
+                    lista.get(i).setText(String.valueOf(niz1BB[i]));
+                    lista.get(i).setTextSize(velicinaFonta);
+                    lista.get(i).setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
+                }
+                if(niz1BKlikabilno[i] == 1){
+                    lista.get(i).setTextSize(18);
+                    lista.get(i).setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                    lista.get(i).setClickable(false);
+                    lista2.add(lista.get(i));
+                }
+            }
+            nizovaProvera = false;
+        }
 
-        /*if(flag2){
+        if(flag7) {
             new SimpleSyncTask().execute();
-            flag2 = false;
-        }*/
+            flag7 = false;
+        }
 
-        //niz5 = totaleNiz;
+
 
 
         button1.setOnClickListener(new View.OnClickListener() {
@@ -211,6 +258,8 @@ public class Tabela extends Algoritam_brz_isecanje {
 
                     }
                 }
+                Memorisanje();
+
             }
         });
         button2.setOnClickListener(new View.OnClickListener() {
@@ -228,6 +277,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button3.setOnClickListener(new View.OnClickListener() {
@@ -242,6 +292,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         button3.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
                     }
                 }
+                Memorisanje();
             }
         });
         button4.setOnClickListener(new View.OnClickListener() {
@@ -259,6 +310,15 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                /*for(int i = 0; i< niz1BB.length; i++) {
+                    System.out.print(niz1BB[i] + " ");
+                }
+                System.out.println();
+                for(int i = 0; i< niz1BKlikabilno.length; i++) {
+                    System.out.print(niz1BKlikabilno[i] + " ");
+                }
+                System.out.println();*/
+                Memorisanje();
             }
         });
         button5.setOnClickListener(new View.OnClickListener() {
@@ -276,6 +336,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button6.setOnClickListener(new View.OnClickListener() {
@@ -293,6 +354,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button7.setOnClickListener(new View.OnClickListener() {
@@ -310,6 +372,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button8.setOnClickListener(new View.OnClickListener() {
@@ -327,6 +390,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button9.setOnClickListener(new View.OnClickListener() {
@@ -344,6 +408,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button10.setOnClickListener(new View.OnClickListener() {
@@ -361,6 +426,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button11.setOnClickListener(new View.OnClickListener() {
@@ -378,6 +444,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button12.setOnClickListener(new View.OnClickListener() {
@@ -395,6 +462,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button13.setOnClickListener(new View.OnClickListener() {
@@ -412,6 +480,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button14.setOnClickListener(new View.OnClickListener() {
@@ -429,6 +498,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button15.setOnClickListener(new View.OnClickListener() {
@@ -446,6 +516,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button16.setOnClickListener(new View.OnClickListener() {
@@ -463,6 +534,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button17.setOnClickListener(new View.OnClickListener() {
@@ -480,6 +552,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button18.setOnClickListener(new View.OnClickListener() {
@@ -497,6 +570,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button19.setOnClickListener(new View.OnClickListener() {
@@ -514,6 +588,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button20.setOnClickListener(new View.OnClickListener() {
@@ -531,6 +606,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button21.setOnClickListener(new View.OnClickListener() {
@@ -548,6 +624,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button22.setOnClickListener(new View.OnClickListener() {
@@ -565,6 +642,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button23.setOnClickListener(new View.OnClickListener() {
@@ -582,6 +660,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button24.setOnClickListener(new View.OnClickListener() {
@@ -599,6 +678,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button25.setOnClickListener(new View.OnClickListener() {
@@ -616,6 +696,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button26.setOnClickListener(new View.OnClickListener() {
@@ -633,6 +714,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button27.setOnClickListener(new View.OnClickListener() {
@@ -650,6 +732,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button28.setOnClickListener(new View.OnClickListener() {
@@ -667,6 +750,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button29.setOnClickListener(new View.OnClickListener() {
@@ -684,6 +768,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button30.setOnClickListener(new View.OnClickListener() {
@@ -701,6 +786,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button31.setOnClickListener(new View.OnClickListener() {
@@ -718,6 +804,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button32.setOnClickListener(new View.OnClickListener() {
@@ -735,6 +822,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button33.setOnClickListener(new View.OnClickListener() {
@@ -752,6 +840,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button34.setOnClickListener(new View.OnClickListener() {
@@ -769,6 +858,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button35.setOnClickListener(new View.OnClickListener() {
@@ -786,6 +876,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button36.setOnClickListener(new View.OnClickListener() {
@@ -803,6 +894,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button37.setOnClickListener(new View.OnClickListener() {
@@ -820,6 +912,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button38.setOnClickListener(new View.OnClickListener() {
@@ -837,6 +930,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button39.setOnClickListener(new View.OnClickListener() {
@@ -854,6 +948,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button40.setOnClickListener(new View.OnClickListener() {
@@ -871,6 +966,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button41.setOnClickListener(new View.OnClickListener() {
@@ -888,6 +984,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button42.setOnClickListener(new View.OnClickListener() {
@@ -905,6 +1002,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button43.setOnClickListener(new View.OnClickListener() {
@@ -922,6 +1020,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button44.setOnClickListener(new View.OnClickListener() {
@@ -939,6 +1038,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button45.setOnClickListener(new View.OnClickListener() {
@@ -956,6 +1056,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button46.setOnClickListener(new View.OnClickListener() {
@@ -973,6 +1074,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button47.setOnClickListener(new View.OnClickListener() {
@@ -990,6 +1092,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button48.setOnClickListener(new View.OnClickListener() {
@@ -1007,6 +1110,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button49.setOnClickListener(new View.OnClickListener() {
@@ -1024,6 +1128,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button50.setOnClickListener(new View.OnClickListener() {
@@ -1041,6 +1146,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button51.setOnClickListener(new View.OnClickListener() {
@@ -1058,6 +1164,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button52.setOnClickListener(new View.OnClickListener() {
@@ -1075,6 +1182,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button53.setOnClickListener(new View.OnClickListener() {
@@ -1092,6 +1200,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button54.setOnClickListener(new View.OnClickListener() {
@@ -1109,6 +1218,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button55.setOnClickListener(new View.OnClickListener() {
@@ -1126,6 +1236,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button56.setOnClickListener(new View.OnClickListener() {
@@ -1143,6 +1254,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button57.setOnClickListener(new View.OnClickListener() {
@@ -1160,6 +1272,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button58.setOnClickListener(new View.OnClickListener() {
@@ -1177,6 +1290,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button59.setOnClickListener(new View.OnClickListener() {
@@ -1194,6 +1308,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button60.setOnClickListener(new View.OnClickListener() {
@@ -1211,6 +1326,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button61.setOnClickListener(new View.OnClickListener() {
@@ -1228,6 +1344,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button62.setOnClickListener(new View.OnClickListener() {
@@ -1245,6 +1362,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button63.setOnClickListener(new View.OnClickListener() {
@@ -1262,6 +1380,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button64.setOnClickListener(new View.OnClickListener() {
@@ -1279,6 +1398,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button65.setOnClickListener(new View.OnClickListener() {
@@ -1296,6 +1416,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button66.setOnClickListener(new View.OnClickListener() {
@@ -1313,6 +1434,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button67.setOnClickListener(new View.OnClickListener() {
@@ -1330,6 +1452,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button68.setOnClickListener(new View.OnClickListener() {
@@ -1347,6 +1470,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button69.setOnClickListener(new View.OnClickListener() {
@@ -1364,6 +1488,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button70.setOnClickListener(new View.OnClickListener() {
@@ -1381,6 +1506,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button71.setOnClickListener(new View.OnClickListener() {
@@ -1398,6 +1524,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button72.setOnClickListener(new View.OnClickListener() {
@@ -1415,6 +1542,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button73.setOnClickListener(new View.OnClickListener() {
@@ -1432,6 +1560,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button74.setOnClickListener(new View.OnClickListener() {
@@ -1449,6 +1578,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button75.setOnClickListener(new View.OnClickListener() {
@@ -1466,6 +1596,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button76.setOnClickListener(new View.OnClickListener() {
@@ -1483,6 +1614,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button77.setOnClickListener(new View.OnClickListener() {
@@ -1500,6 +1632,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button78.setOnClickListener(new View.OnClickListener() {
@@ -1517,6 +1650,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button79.setOnClickListener(new View.OnClickListener() {
@@ -1534,6 +1668,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button80.setOnClickListener(new View.OnClickListener() {
@@ -1551,6 +1686,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
         button81.setOnClickListener(new View.OnClickListener() {
@@ -1568,6 +1704,7 @@ public class Tabela extends Algoritam_brz_isecanje {
                         //PROVERA DALI JE RESEN SUDOKU
                     }
                 }
+                Memorisanje();
             }
         });
 
@@ -1575,6 +1712,28 @@ public class Tabela extends Algoritam_brz_isecanje {
 
 
 
+    }
+
+    public void Memorisanje(){
+        Thread thread = new Thread(){
+            public void run(){
+                for(int i = 0; i< niz1BB.length; i++){
+                    if(!String.valueOf(lista.get(i).getText()).equals("")){
+                        niz1BB[i] = Integer.parseInt(String.valueOf(lista.get(i).getText()));
+                    }else{
+                        niz1BB[i] = 0;
+                    }
+                }
+                for(int i = 0; i< niz1BB.length; i++) {
+                    System.out.print(niz1BB[i] + " ");
+                }
+                System.out.println();
+                System.out.println("********************************************************************************************************");
+                System.out.println("********************************************************************************************************");
+                System.out.println("********************************************************************************************************");
+            }
+        };
+        thread.start();
     }
  /*   @Override
     protected void onSaveInstanceState(Bundle outState){
@@ -1601,14 +1760,48 @@ public class Tabela extends Algoritam_brz_isecanje {
     }*/
 
 
+    /*@Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
+        for(int i =0; i <lista.size(); i++){  // ovdfe se mora pre novog napisivanja preko buttona prvo obrisati sve sa buttona
+            lista.get(i).setText("");
+            lista.get(i).setClickable(true);
+        }
+        Intent i = new Intent(this, MainActivity.class);
+        flag7 = true;
+        Tabela.this.finish();
+        startActivity(i);
+    }*/
 
     @Override
-    protected void onStart() {
-        super.onStart();
-            /*new SimpleSyncTask().execute();*/
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getResources().getString(R.string.exitTabela))
+                .setCancelable(false)
+                .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        for(int i =0; i <lista.size(); i++){  // ovdfe se mora pre novog napisivanja preko buttona prvo obrisati sve sa buttona
+                            lista.get(i).setText("");
+                            lista.get(i).setClickable(true);
+                        }
+                        Intent i = new Intent(Tabela.this, MainActivity.class);
+                        flag7 = true;
+                        Tabela.this.finish();
+                        startActivity(i);
+                    }
+                })
+                .setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
 
     }
+
+
 
     public void rbclick(View v){
         int radioButton = radioGroup.getCheckedRadioButtonId();
@@ -1665,6 +1858,7 @@ public class Tabela extends Algoritam_brz_isecanje {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    flag7 = true;
                     finish();
                 }
             });
@@ -1687,6 +1881,7 @@ public class Tabela extends Algoritam_brz_isecanje {
         @Override
         protected void onPostExecute(String s) {
 
+            lista2 = new ArrayList<>();
             for(int i = 0; i<niz1.length; i++){
                 if(niz1[i]!=0){
                     lista.get(i).setText(String.valueOf(niz1[i]));
@@ -1694,13 +1889,27 @@ public class Tabela extends Algoritam_brz_isecanje {
                     lista.get(i).setTextSize(18);
                     lista.get(i).setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));  //Kod za boldovanje texta
                     lista2.add(lista.get(i));
+                    niz1BKlikabilno[i] = 1;
+                }else{
+                    niz1BKlikabilno[i] = 0;
+                }
+
+                if(niz1BKlikabilno[i] == 1){
+                    lista2.add(lista.get(i));
                 }
             }
+            nizovaProvera = true;
+            Memorisanje();
+
             progressDialo.dismiss();
 
         }
         @Override
         protected String doInBackground(String... params) {
+            for(int i =0; i <lista.size(); i++){  // ovdfe se mora pre novog napisivanja preko buttona prvo obrisati sve sa buttona
+                lista.get(i).setText("");
+                lista.get(i).setClickable(true);
+            }
 
             String finalni = String.valueOf(getIntent().getExtras().getInt("Procenat"));
             putINTENT = finalni;
@@ -1724,4 +1933,42 @@ public class Tabela extends Algoritam_brz_isecanje {
 
 
     }
+
+
+
+    public void onStart()
+    {
+        super.onStart();
+        Log.d(tag, "In the onStart() event");
+    }
+    public void onRestart()
+    {
+        super.onRestart();
+        Log.d(tag, "In the onRestart() event");
+    }
+    public void onResume()
+    {
+        super.onResume();
+        Log.d(tag, "In the onResume() event");
+    }
+    public void onPause()
+    {
+        super.onPause();
+        Log.d(tag, "In the onPause() event");
+        nizovaProvera = true;
+    }
+    public void onStop()
+    {
+        super.onStop();
+        Log.d(tag, "In the onStop() event");
+        //new Memorisanje().execute();
+    }
+    public void onDestroy()
+    {
+        super.onDestroy();
+        Log.d(tag, "In the onDestroy() event");
+
+
+    }
 }
+//ku I/System.ou

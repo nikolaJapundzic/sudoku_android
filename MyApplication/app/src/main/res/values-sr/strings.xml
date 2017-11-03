@@ -26,4 +26,8 @@
     <string name="infoGIT2">https://github.com/nikolaJapundzic/sudoku_android.git</string>
     <string name="infoGame1">Правила игре:</string>
     <string name="infoGame2">Сваки ред, колона и 3х3 квадрат, морају садржати бројеве од 1 до 9 без дупликата.</string>
+    <string name="exitTabela">Ако притиснете Изађи, нећете бити у могућности да наставите исту игру.</string>
+    <string name="yes">Изађи</string>
+    <string name="no">Не</string>
+    <string name="exitMain">Да ли сте сигурни да желите да напустите апликацију?</string>
 </resources>
